@@ -1,0 +1,14 @@
+.wrap {
+    width: 100%;
+}
+
+.main,
+.btnWH {
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%
+}
+
+.btnGlobalSetAll {
+    width: 100%
+}
