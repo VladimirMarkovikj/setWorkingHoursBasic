@@ -14,7 +14,7 @@ class WorkingDay extends Component {
     secondShiftClosing: "",
     open: true,
     secondShift: false,
-    working247: false
+    working24: false,
   };
 
   componentDidMount() {
@@ -244,11 +244,21 @@ class WorkingDay extends Component {
     }
   };
 
+  setRemoveWorking24 = () => {
+    console.log(this.state.working24);
+    this.setState(
+      (prev) => ({ working24: !prev.working24 }),
+      () => {
+        console.log(this.state.working24);
+      }
+    );
+  };
+
   render() {
     return (
       <div className={classes.wrap}>
         <div className={classes.showDay}>{this.props.day}</div>
-        {this.state.open && (
+        {this.state.open && this.state.working24 && (
           <React.Fragment>
             <div className={classes.shiftHead}>First shift</div>
             <div className={classes.selects}>
@@ -372,10 +382,19 @@ class WorkingDay extends Component {
           </React.Fragment>
         )}
 
+        <div>
+          <div></div>
+        </div>
+
         <div className={classes.wrap}>
           <div className={classes.addRemoveCloseOpenBtnWrap}>
             {this.state.open ? (
-              <button onClick={() => this.openClose("close")}>Close</button>
+              <div>
+                <button onClick={() => this.openClose("close")}>Close</button>
+                <button onClick={this.setRemoveWorking24}>
+                  {this.state.working24 ? "set 00 - 24" : "remove 00-24"}
+                </button>
+              </div>
             ) : (
               <button onClick={() => this.openClose("open")}>Open</button>
             )}
