@@ -40,7 +40,7 @@ class App extends Component {
       <div className={classes.wrap}>
         <div className={classes.main}>
           <div className={classes.btnWH}>
-            <button className={classes.btnGlobalSetAll} >
+            <button onClick={this.setMainWorkingHours} className={classes.btnGlobalSetAll} >
               Get Working hours
             </button>
           </div>

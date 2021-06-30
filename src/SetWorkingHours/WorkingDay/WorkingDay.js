@@ -51,17 +51,34 @@ class WorkingDay extends Component {
       if (nextProps.Hours.length === 1) {
         let [firstShiftOpening, firstShiftClosing] =
           nextProps.Hours[0].split(" - ");
-        this.setState({
-          firstShiftOpening: firstShiftOpening,
-          firstShiftClosing: firstShiftClosing,
-          secondShiftOpening: "",
-          secondShiftClosing: "",
-          availableWorkingHoursFirstShiftClosing: [firstShiftClosing],
-          availableWorkingHoursSecondShiftOpening: [],
-          availableWorkingHoursSecondShiftClosing: [],
-          open: true,
-          secondShift: false,
-        });
+        console.log(firstShiftOpening, firstShiftClosing);
+        if (firstShiftOpening === "00:00" && firstShiftClosing === "24:00") {
+          this.setState({
+            firstShiftOpening: firstShiftOpening,
+            firstShiftClosing: firstShiftClosing,
+            secondShiftOpening: "",
+            secondShiftClosing: "",
+            availableWorkingHoursFirstShiftClosing: [],
+            availableWorkingHoursSecondShiftOpening: [],
+            availableWorkingHoursSecondShiftClosing: [],
+            open: true,
+            secondShift: false,
+            working24: true,
+          });
+        } else {
+          this.setState({
+            firstShiftOpening: firstShiftOpening,
+            firstShiftClosing: firstShiftClosing,
+            secondShiftOpening: "",
+            secondShiftClosing: "",
+            availableWorkingHoursFirstShiftClosing: [firstShiftClosing],
+            availableWorkingHoursSecondShiftOpening: [],
+            availableWorkingHoursSecondShiftClosing: [],
+            open: true,
+            secondShift: false,
+            working24: false,
+          });
+        }
       } else if (nextProps.Hours.length === 2) {
         let [firstShiftOpening, firstShiftClosing] =
           nextProps.Hours[0].split(" - ");
@@ -77,6 +94,7 @@ class WorkingDay extends Component {
           availableWorkingHoursSecondShiftClosing: [secondShiftClosing],
           open: true,
           secondShift: true,
+          working24: false,
         });
       } else if (nextProps.Hours.length === 0) {
         this.setState(
@@ -92,6 +110,7 @@ class WorkingDay extends Component {
             secondShiftClosing: "",
             open: false,
             secondShift: false,
+            working24: false,
           },
           () => {
             this.setAllPossibleAndAvailableFirstShiftWH();
@@ -249,16 +268,72 @@ class WorkingDay extends Component {
     this.setState(
       (prev) => ({ working24: !prev.working24 }),
       () => {
-        console.log(this.state.working24);
+        this.setterWorking24();
       }
     );
+  };
+
+  setterWorking24 = () => {
+    console.log(this.state.working24);
+    if (this.state.working24) {
+      this.setState(
+        {
+          availableWorkingHoursFirstShiftOpening: [],
+          firstShiftOpening: "00:00",
+          availableWorkingHoursFirstShiftClosing: [],
+          firstShiftClosing: "24:00",
+          availableWorkingHoursSecondShiftOpening: [],
+          secondShiftOpening: "",
+          availableWorkingHoursSecondShiftClosing: [],
+          secondShiftClosing: "",
+          open: true,
+          secondShift: false,
+        },
+        () => {
+          this.props.SetWorkingHours(
+            this.props.day,
+            this.state.firstShiftOpening,
+            this.state.firstShiftClosing,
+            this.state.secondShiftOpening,
+            this.state.secondShiftClosing,
+            this.state.working24
+          );
+        }
+      );
+    } else {
+      this.setState(
+        {
+          availableWorkingHoursFirstShiftOpening: [],
+          firstShiftOpening: "0:00",
+          availableWorkingHoursFirstShiftClosing: [],
+          firstShiftClosing: "",
+          availableWorkingHoursSecondShiftOpening: [],
+          secondShiftOpening: "",
+          availableWorkingHoursSecondShiftClosing: [],
+          secondShiftClosing: "",
+          open: true,
+          secondShift: false,
+        },
+        () => {
+          this.setAllPossibleAndAvailableFirstShiftWH();
+          this.props.SetWorkingHours(
+            this.props.day,
+            this.state.firstShiftOpening,
+            this.state.firstShiftClosing,
+            this.state.secondShiftOpening,
+            this.state.secondShiftClosing,
+            this.state.working24
+          );
+        }
+      );
+    }
   };
 
   render() {
     return (
       <div className={classes.wrap}>
         <div className={classes.showDay}>{this.props.day}</div>
-        {this.state.open && this.state.working24 && (
+        {this.state.open && !this.state.working24 && (
           <React.Fragment>
             <div className={classes.shiftHead}>First shift</div>
             <div className={classes.selects}>
@@ -382,9 +457,11 @@ class WorkingDay extends Component {
           </React.Fragment>
         )}
 
-        <div>
-          <div></div>
-        </div>
+        {this.state.working24 && (
+          <div className={classes.wrap}>
+            <div style={{ textAlign: "center" }}>Working 00:00 - 24:00</div>
+          </div>
+        )}
 
         <div className={classes.wrap}>
           <div className={classes.addRemoveCloseOpenBtnWrap}>
@@ -392,11 +469,14 @@ class WorkingDay extends Component {
               <div>
                 <button onClick={() => this.openClose("close")}>Close</button>
                 <button onClick={this.setRemoveWorking24}>
-                  {this.state.working24 ? "set 00 - 24" : "remove 00-24"}
+                  {this.state.working24 ? "remove 00 - 24" : "set 00-24"}
                 </button>
               </div>
             ) : (
-              <button onClick={() => this.openClose("open")}>Open</button>
+              <div className={classes.wrap}>
+                <div style={{ textAlign: "center" }}>Closed</div>
+                <button onClick={() => this.openClose("open")}>Open</button>
+              </div>
             )}
           </div>
         </div>
