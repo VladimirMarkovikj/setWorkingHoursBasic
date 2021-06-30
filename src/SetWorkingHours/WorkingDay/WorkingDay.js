@@ -64,7 +64,7 @@ class WorkingDay extends Component {
             open: true,
             secondShift: false,
             working24: true,
-          });
+          },()=>{this.setAllPossibleAndAvailableFirstShiftWH()});
         } else {
           this.setState({
             firstShiftOpening: firstShiftOpening,
@@ -290,6 +290,7 @@ class WorkingDay extends Component {
           secondShift: false,
         },
         () => {
+          this.setAllPossibleAndAvailableFirstShiftWH();
           this.props.SetWorkingHours(
             this.props.day,
             this.state.firstShiftOpening,
